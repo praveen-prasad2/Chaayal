@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
     const search = searchParams.get('search')?.trim();
+    const limitParam = Number(searchParams.get('limit'));
+    const limit =
+      Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : undefined;
     
     const query: Record<string, any> = {};
     if (category) {
@@ -21,7 +24,11 @@ export async function GET(request: NextRequest) {
         { category: { $regex: search, $options: 'i' } },
       ];
     }
-    const products = await Product.find(query).sort({ createdAt: -1 });
+    let productQuery = Product.find(query).sort({ createdAt: -1 });
+    if (limit) {
+      productQuery = productQuery.limit(limit);
+    }
+    const products = await productQuery;
     
     return NextResponse.json({ success: true, data: products });
   } catch (error: any) {

@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { Menu, Search, User } from 'lucide-react';
 import Image from 'next/image';
-import { FormEvent, useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import ProductSearch from '@/components/search/ProductSearch';
 
 const NAV_LINKS = [
     { label: 'Home', href: '/' },
@@ -18,15 +18,6 @@ const NAV_LINKS = [
 export default function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
-    const [searchTerm, setSearchTerm] = useState<string>(searchParams?.get('search') ?? '');
-
-    const handleSearch = (event: FormEvent) => {
-        event.preventDefault();
-        const query = searchTerm.trim();
-        if (!query) return;
-        router.push(`/products?search=${encodeURIComponent(query)}`);
-    };
 
     const handleMobileSearch = () => {
         const query = window.prompt('Search products');
@@ -45,22 +36,9 @@ export default function Navbar() {
         <header className="sticky top-0 z-50 bg-primary shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <div className="border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-                    <form
-                        onSubmit={handleSearch}
-                        className="hidden md:flex items-center gap-2 border rounded-2xl border-gray-300 px-4 py-2"
-                    >
-                        <Search className="h-4 w-4 text-white" />
-                        <input
-                            type="search"
-                            placeholder="Search products"
-                            value={searchTerm}
-                            onChange={(event) => setSearchTerm(event.target.value)}
-                            className="bg-transparent text-sm text-white placeholder:text-white focus:outline-none"
-                        />
-                        <button type="submit" className="sr-only">
-                            Search
-                        </button>
-                    </form>
+                    <div className="hidden md:flex flex-1 max-w-xs">
+                        <ProductSearch />
+                    </div>
 
                     <div className="flex-1 flex md:flex-none justify-center text-center">
                         <Link href="/" className="leading-tight">
