@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import crypto from 'crypto';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-export const config = {
-  api: {
-    bodyParser: false,
-    sizeLimit: '25mb',
-  },
-};
-
 export async function POST(request: NextRequest) {
   try {
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      throw new Error('BLOB_READ_WRITE_TOKEN is not configured.');
+    }
+
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
 
@@ -32,9 +29,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadDir, { recursive: true });
 
     const urls: string[] = [];
 
@@ -58,12 +52,16 @@ export async function POST(request: NextRequest) {
 
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const ext = path.extname(file.name) || '.jpg';
-      const uniqueName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
-      const filePath = path.join(uploadDir, uniqueName);
+      const ext = file.name?.includes('.') ? `.${file.name.split('.').pop()}` : '.jpg';
+      const uniqueName = `uploads/${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
 
-      await fs.writeFile(filePath, buffer);
-      urls.push(`/uploads/${uniqueName}`);
+      const blob = await put(uniqueName, buffer, {
+        access: 'public',
+        contentType: file.type,
+        token,
+      });
+
+      urls.push(blob.url);
     }
 
     return NextResponse.json({ success: true, urls });
