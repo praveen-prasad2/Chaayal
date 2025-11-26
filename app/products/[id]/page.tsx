@@ -83,7 +83,7 @@ export default function ProductDetail() {
       `Category: ${product.category}\n` +
       (selectedSize ? `Size: ${selectedSize}\n` : '') +
       (selectedColor ? `Color: ${selectedColor}\n` : '') +
-      (firstImage ? `\nImage: ${firstImage}\n\n` : '\n') +
+      (firstImage ? `\n${firstImage}\n\n` : '\n') +
       `Please confirm availability and provide order details.`;
 
     const encodedMessage = encodeURIComponent(message);
