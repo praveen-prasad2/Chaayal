@@ -7,6 +7,13 @@ const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+export const config = {
+  api: {
+    bodyParser: false,
+    sizeLimit: '25mb',
+  },
+};
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
