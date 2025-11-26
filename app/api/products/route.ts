@@ -8,8 +8,19 @@ export async function GET(request: NextRequest) {
     
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const search = searchParams.get('search')?.trim();
     
-    const query = category ? { category } : {};
+    const query: Record<string, any> = {};
+    if (category) {
+      query.category = category;
+    }
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
+      ];
+    }
     const products = await Product.find(query).sort({ createdAt: -1 });
     
     return NextResponse.json({ success: true, data: products });

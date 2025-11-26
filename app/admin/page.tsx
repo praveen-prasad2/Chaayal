@@ -45,6 +45,9 @@ const SIDEBAR_LINKS = [
   { id: 'all-products', label: 'All Products' },
   { id: 'enquiries', label: 'Enquiries' },
 ] as const;
+const CATEGORY_OPTIONS = ['Women', 'Men'] as const;
+const normalizeCategory = (value?: string | null) =>
+  CATEGORY_OPTIONS.find((option) => option.toLowerCase() === (value || '').toLowerCase()) ?? CATEGORY_OPTIONS[0];
 type SectionKey = (typeof SIDEBAR_LINKS)[number]['id'];
 
 const formatCurrency = (value: number) =>
@@ -56,7 +59,7 @@ const initialForm: ProductFormState = {
   name: '',
   sku: '',
   description: '',
-  category: '',
+  category: CATEGORY_OPTIONS[0],
   price: '',
   originalPrice: '',
   discountPercentage: '',
@@ -235,7 +238,7 @@ export default function AdminPage() {
       name: product.name,
       sku: product.sku || '',
       description: product.description,
-      category: product.category,
+      category: normalizeCategory(product.category),
       price: product.price.toString(),
       originalPrice: product.originalPrice?.toString() || '',
       discountPercentage: product.discountPercentage?.toString() || '',
@@ -519,12 +522,23 @@ function CreateProductSection({
             onChange={(value) => onFieldChange((prev) => ({ ...prev, sku: value }))}
             placeholder="e.g., CH-001"
           />
-          <TextField
-            label="Category"
-            required
-            value={form.category}
-            onChange={(value) => onFieldChange((prev) => ({ ...prev, category: value }))}
-          />
+          <label className="text-sm font-medium text-gray-600">
+            Category
+            <select
+              value={form.category}
+              onChange={(event) =>
+                onFieldChange((prev) => ({ ...prev, category: normalizeCategory(event.target.value) }))
+              }
+              required
+              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#73181F]"
+            >
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
           <TextField
             label="Price (₹)"
             required

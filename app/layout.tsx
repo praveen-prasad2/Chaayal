@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Geist_Mono } from "next/font/google";
+import AppShell from "@/components/layout/AppShell";
 import "./globals.css";
 
 const gilroy = localFont({
@@ -52,8 +53,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${gilroy.variable} ${geistMono.variable} antialiased`}>
-        {children}
+      <body className={`${gilroy.variable} ${geistMono.variable} antialiased bg-white`}>
+        <AppShell>
+          <div className="min-h-screen">{children}</div>
+        </AppShell>
       </body>
     </html>
   );

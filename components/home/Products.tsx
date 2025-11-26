@@ -94,53 +94,55 @@ export default function Products() {
         return image;
     };
 
-    const collectionsMap = new Map<string, Product[]>();
-    products.forEach((product) => {
-        const key = product.category || 'Featured';
-        if (!collectionsMap.has(key)) {
-            collectionsMap.set(key, []);
-        }
-        collectionsMap.get(key)!.push(product);
-    });
+    const normalizedCategory = (category?: string) => category?.trim().toLowerCase() || '';
+    const menProducts = products.filter((product) => normalizedCategory(product.category) === 'men');
+    const womenProducts = products.filter((product) => normalizedCategory(product.category) === 'women');
 
-    const orderedCollections = Array.from(collectionsMap.entries()).map(([title, items]) => ({
-        title,
-        items,
-    }));
+    const sections = [
+        {
+            id: 'men',
+            eyebrow: '',
+            title: 'Men',
+            description: 'Relaxed kurta sets and contemporary festive looks for him.',
+            items: menProducts,
+        },
+        {
+            id: 'women',
+            eyebrow: '',
+            title: 'Women',
+            description: 'Handloom-first silhouettes, drapes, and coordinates tailored for her.',
+            items: womenProducts,
+        },
+    ];
 
-    const featuredCollections =
-        orderedCollections.length > 0
-            ? orderedCollections.slice(0, 2)
-            : [{ title: 'Featured Edit', items: products }];
+    const hasInventory = sections.some((section) => section.items.length > 0);
 
     return (
         <section id="products" className="py-20 bg-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
-                {products.length === 0 ? (
+                {!hasInventory ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-500 text-lg">No products found in the collection.</p>
+                        <p className="text-gray-500 text-lg">Once the Men &amp; Women edits are stocked, they&apos;ll appear here.</p>
                     </div>
                 ) : (
-                    featuredCollections.map((collection, index) => {
-                        const eyebrowPresets = ['DROP 25.25', 'Onam 2025'];
-                        const eyebrow = eyebrowPresets[index] || 'Featured Edit';
-
+                    sections.map((section) => {
+                        if (section.items.length === 0) return null;
                         return (
-                        <div key={`${collection.title}-${index}`} className="space-y-10">
-                            <div className="text-center space-y-3">
-                                <p className="text-xs uppercase tracking-[0.35em] text-gray-500">
-                                    {eyebrow}
-                                </p>
-                                <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a1a]">
-                                    {collection.title}
-                                </h2>
-                                <p className="text-sm text-gray-500 max-w-2xl mx-auto">
-                                    Curated edits featuring four looks per drop, inspired by the reference layout provided.
-                                </p>
-                            </div>
+                            <div key={section.id} id={section.id} className="space-y-10">
+                                <div className="text-center space-y-3">
+                                    <p className="text-xs uppercase tracking-[0.35em] text-gray-500">
+                                        {section.eyebrow}
+                                    </p>
+                                    <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a1a]">
+                                        {section.title}
+                                    </h2>
+                                    <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+                                        {section.description}
+                                    </p>
+                                </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                                {collection.items.slice(0, 4).map((product) => {
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    {section.items.slice(0, 4).map((product) => {
                                     const hasOriginal =
                                         typeof product.originalPrice === 'number' &&
                                         product.originalPrice > product.price;
@@ -166,11 +168,6 @@ export default function Products() {
                                                 <h3 className="text-lg font-medium text-[#1a1a1a]">
                                                     {product.name}
                                                 </h3>
-                                            {product.sku && (
-                                                <p className="text-[0.7rem] tracking-[0.25em] text-gray-400">
-                                                    SKU {product.sku}
-                                                </p>
-                                            )}
                                                 <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
                                                     {product.category}
                                                 </p>
@@ -184,18 +181,18 @@ export default function Products() {
                                             </div>
                                         </article>
                                     );
-                                })}
-                            </div>
+                                    })}
+                                </div>
 
-                            <div className="flex justify-center">
-                                <Link
-                                    href="/products"
-                                    className="px-10 py-3 rounded-full border border-[#1a1a1a] text-xs uppercase tracking-[0.35em] hover:bg-[#1a1a1a] hover:text-white transition-colors"
-                                >
-                                    View All Products
-                                </Link>
+                                <div className="flex justify-center">
+                                    <Link
+                                        href="/products"
+                                        className="px-10 py-3 rounded-full border border-[#1a1a1a] text-xs uppercase tracking-[0.35em] hover:bg-[#1a1a1a] hover:text-white transition-colors"
+                                    >
+                                        View All Products
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
                         );
                     })
                 )}
