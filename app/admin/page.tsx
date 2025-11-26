@@ -68,6 +68,7 @@ const initialForm: ProductFormState = {
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
@@ -280,6 +281,18 @@ export default function AdminPage() {
     }
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPassword('');
+    setShowPassword(false);
+    setProducts([]);
+    setForm(initialForm);
+    setEditingProduct(null);
+    setActiveSection('create-product');
+    setToast('');
+    setError('');
+  };
+
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#73181F] px-4">
@@ -293,13 +306,36 @@ export default function AdminPage() {
           </div>
           <label className="block text-sm font-medium text-gray-600">
             Password
-            <input
-              type="password"
-              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#73181F]"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full border rounded-md px-3 py-2 pr-11 focus:outline-none focus:ring-2 focus:ring-[#73181F]"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-800 focus:outline-none"
+                aria-label="Toggle password visibility"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2.5 12s4-6.5 9.5-6.5 9.5 6.5 9.5 6.5-4 6.5-9.5 6.5S2.5 12 2.5 12z" />
+                  <circle cx="12" cy="12" r="3" />
+                  {!showPassword && <path d="M4 20 20 4" />}
+                </svg>
+              </button>
+            </div>
           </label>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <button
@@ -319,6 +355,13 @@ export default function AdminPage() {
         <div className="px-6 py-8 border-b">
           <h2 className="text-2xl font-bold text-[#73181F]">Chaayal Admin</h2>
           <p className="text-sm text-gray-500">Manage products & enquiries</p>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-4 text-sm text-red-600 hover:text-red-700 font-medium"
+          >
+            Logout
+          </button>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           {SIDEBAR_LINKS.map((link) => (
@@ -339,28 +382,37 @@ export default function AdminPage() {
 
       <div className="flex-1">
         <div className="md:hidden bg-white shadow px-4 py-4 sticky top-0 z-10">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-semibold" style={{ color: '#73181F' }}>
               Chaayal Admin
             </h1>
-            <details className="relative">
-              <summary className="list-none cursor-pointer px-4 py-2 border rounded-lg text-sm">
-                Menu
-              </summary>
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-20">
-                {SIDEBAR_LINKS.map((link) => (
-                  <button
-                    key={link.id}
-                    onClick={() => setActiveSection(link.id)}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                      activeSection === link.id ? 'text-[#73181F]' : ''
-                    }`}
-                  >
-                    {link.label}
-                  </button>
-                ))}
-              </div>
-            </details>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-sm text-red-600"
+              >
+                Logout
+              </button>
+              <details className="relative">
+                <summary className="list-none cursor-pointer px-4 py-2 border rounded-lg text-sm">
+                  Menu
+                </summary>
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-20">
+                  {SIDEBAR_LINKS.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => setActiveSection(link.id)}
+                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        activeSection === link.id ? 'text-[#73181F]' : ''
+                      }`}
+                    >
+                      {link.label}
+                    </button>
+                  ))}
+                </div>
+              </details>
+            </div>
           </div>
         </div>
 
@@ -667,7 +719,9 @@ function ProductsTableSection({
           <table className="min-w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-left text-gray-500 uppercase tracking-wide text-xs">
+                <th className="px-4 py-3">Preview</th>
                 <th className="px-4 py-3">Product</th>
+                <th className="px-4 py-3">SKU</th>
                 <th className="px-4 py-3">Pricing</th>
                 <th className="px-4 py-3">Stock</th>
                 <th className="px-4 py-3">Category</th>
@@ -678,11 +732,24 @@ function ProductsTableSection({
               {products.map((product) => (
                 <tr key={product._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{product.name}</p>
-                    {product.sku && (
-                      <p className="text-xs text-gray-500 font-mono">SKU: {product.sku}</p>
+                    {product.images?.[0] || product.imageUrl ? (
+                      <img
+                        src={product.images?.[0] || product.imageUrl}
+                        alt={product.name}
+                        className="h-16 w-16 rounded-lg object-cover border"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 rounded-lg border border-dashed flex items-center justify-center text-xs text-gray-400">
+                        No Image
+                      </div>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{product.name}</p>
                     <p className="text-xs text-gray-500 line-clamp-1">{product.description}</p>
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-700">
+                    {product.sku || '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="text-gray-900 font-semibold">
