@@ -36,7 +36,7 @@ export default function ProductSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [query, setQuery] = useState(searchParams?.get('search') ?? '');
+  const [query, setQuery] = useState(() => searchParams?.get('search') ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [results, setResults] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);

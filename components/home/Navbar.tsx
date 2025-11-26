@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Menu, Search, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
+import { Suspense } from 'react';
 import ProductSearch from '@/components/search/ProductSearch';
 
 const NAV_LINKS = [
@@ -37,7 +38,21 @@ export default function Navbar() {
             <div className="border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
                     <div className="hidden md:flex flex-1 max-w-xs">
-                        <ProductSearch />
+                        <Suspense fallback={
+                            <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm w-full">
+                                <input
+                                    type="search"
+                                    placeholder="Search"
+                                    disabled
+                                    className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+                                />
+                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-white">
+                                    <Search className="h-4 w-4" />
+                                </div>
+                            </div>
+                        }>
+                            <ProductSearch />
+                        </Suspense>
                     </div>
 
                     <div className="flex-1 flex md:flex-none justify-center text-center">
