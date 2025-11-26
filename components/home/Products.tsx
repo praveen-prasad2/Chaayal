@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 interface Product {
     _id: string;
     name: string;
+    sku?: string;
     price: number;
     originalPrice?: number;
     imageUrl?: string;
@@ -147,7 +148,10 @@ export default function Products() {
                                     return (
                                         <article key={product._id} className="space-y-4 group">
                                             <Link href={`/products/${product._id}`} className="block">
-                                                <div className="relative aspect-[3/4] bg-[#f5f5f5] overflow-hidden">
+                                                <div
+                                                    className="relative bg-[#f5f5f5] overflow-hidden"
+                                                    style={{ aspectRatio: '3 / 4' }}
+                                                >
                                                     <Image
                                                         src={getImageUrl(product)}
                                                         alt={product.name}
@@ -162,6 +166,11 @@ export default function Products() {
                                                 <h3 className="text-lg font-medium text-[#1a1a1a]">
                                                     {product.name}
                                                 </h3>
+                                            {product.sku && (
+                                                <p className="text-[0.7rem] tracking-[0.25em] text-gray-400">
+                                                    SKU {product.sku}
+                                                </p>
+                                            )}
                                                 <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
                                                     {product.category}
                                                 </p>

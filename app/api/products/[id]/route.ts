@@ -38,6 +38,10 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     
+    if (body.sku !== undefined) {
+      body.sku = String(body.sku).trim().toUpperCase();
+    }
+
     // Handle images array - ensure it exists or fallback to imageUrl
     if (body.images !== undefined) {
       if (!body.images || body.images.length === 0) {

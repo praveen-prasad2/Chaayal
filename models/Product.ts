@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IProduct extends Document {
   name: string;
   description: string;
+  sku?: string;
   price: number;
   imageUrl: string; // Google Drive image URL (kept for backward compatibility)
   images: string[]; // Array of Google Drive image URLs
@@ -22,6 +23,11 @@ const ProductSchema: Schema = new Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    sku: {
+      type: String,
+      trim: true,
+      uppercase: true,
     },
     description: {
       type: String,

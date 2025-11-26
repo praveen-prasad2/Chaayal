@@ -12,6 +12,7 @@ import {
 type Product = {
   _id: string;
   name: string;
+  sku?: string;
   description: string;
   category: string;
   price: number;
@@ -26,6 +27,7 @@ type Product = {
 
 type ProductFormState = {
   name: string;
+  sku: string;
   description: string;
   category: string;
   price: string;
@@ -52,6 +54,7 @@ const formatCurrency = (value: number) =>
 
 const initialForm: ProductFormState = {
   name: '',
+  sku: '',
   description: '',
   category: '',
   price: '',
@@ -168,8 +171,13 @@ export default function AdminPage() {
     if (!form.images.length) {
       throw new Error('Please upload at least one product image.');
     }
+    const sku = form.sku.trim().toUpperCase();
+    if (!sku) {
+      throw new Error('Please provide a SKU.');
+    }
     return {
       name: form.name.trim(),
+      sku,
       description: form.description.trim(),
       category: form.category.trim(),
       price: Number(form.price) || 0,
@@ -224,6 +232,7 @@ export default function AdminPage() {
     setEditingProduct(product);
     setForm({
       name: product.name,
+      sku: product.sku || '',
       description: product.description,
       category: product.category,
       price: product.price.toString(),
@@ -452,6 +461,13 @@ function CreateProductSection({
             onChange={(value) => onFieldChange((prev) => ({ ...prev, name: value }))}
           />
           <TextField
+            label="SKU"
+            required
+            value={form.sku}
+            onChange={(value) => onFieldChange((prev) => ({ ...prev, sku: value }))}
+            placeholder="e.g., CH-001"
+          />
+          <TextField
             label="Category"
             required
             value={form.category}
@@ -663,6 +679,9 @@ function ProductsTableSection({
                 <tr key={product._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <p className="font-medium text-gray-900">{product.name}</p>
+                    {product.sku && (
+                      <p className="text-xs text-gray-500 font-mono">SKU: {product.sku}</p>
+                    )}
                     <p className="text-xs text-gray-500 line-clamp-1">{product.description}</p>
                   </td>
                   <td className="px-4 py-3">

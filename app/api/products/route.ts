@@ -27,6 +27,15 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
+
+    if (!body.sku) {
+      return NextResponse.json(
+        { success: false, error: 'SKU is required' },
+        { status: 400 }
+      );
+    }
+
+    body.sku = String(body.sku).trim().toUpperCase();
     
     // Ensure images array exists and is not empty, or fallback to imageUrl
     if (!body.images || body.images.length === 0) {

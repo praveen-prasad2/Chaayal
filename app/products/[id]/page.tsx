@@ -7,6 +7,7 @@ import ImageSlider from '@/components/ImageSlider';
 interface Product {
   _id: string;
   name: string;
+  sku?: string;
   description: string;
   price: number;
   imageUrl?: string;
@@ -77,6 +78,7 @@ export default function ProductDetail() {
 
     const message = `Hello! I would like to order:\n\n` +
       `Product: ${product.name}\n` +
+      (product.sku ? `SKU: ${product.sku}\n` : '') +
       `Price: ₹${product.price.toFixed(2)}\n` +
       `Category: ${product.category}\n` +
       (selectedSize ? `Size: ${selectedSize}\n` : '') +
@@ -168,6 +170,11 @@ export default function ProductDetail() {
               <h1 className="text-4xl font-bold mb-4" style={{ color: '#73181F' }}>
                 {product.name}
               </h1>
+              {product.sku && (
+                <p className="text-xs uppercase tracking-[0.35em] text-gray-500 mb-4">
+                  SKU {product.sku}
+                </p>
+              )}
               
               <div className="mb-6 flex items-baseline gap-4">
                 <p className="text-4xl font-bold" style={{ color: '#73181F' }}>
